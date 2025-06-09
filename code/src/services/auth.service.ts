@@ -7,6 +7,8 @@ import { UserTokens } from '../models/user-tokens.model';
 import crypto from 'crypto';
 import { Response } from 'express';
 import { apiResponse } from '../utils/api-response.util';
+import { SignUpCodes } from '../models/sign-up-codes.model';
+import { Role } from '../models/role.model';
 
 export const initializePassport = () => {
     // Local strategy for email/password login
@@ -68,7 +70,7 @@ export const initializePassport = () => {
 export const generateTokens = async (userId: number): Promise<{ accessToken: string; refreshToken: string }> => {
     const accessToken = crypto.randomBytes(32).toString('hex');
     const refreshToken = crypto.randomBytes(32).toString('hex');
-    
+
     const accessTokenExpiresAt = new Date();
     accessTokenExpiresAt.setHours(accessTokenExpiresAt.getHours() + 1); // Access token expires in 1 hour
 
@@ -98,7 +100,7 @@ export const refreshAccessToken = async (refreshToken: string): Promise<{ access
     // Generate new tokens
     const newAccessToken = crypto.randomBytes(32).toString('hex');
     const newRefreshToken = crypto.randomBytes(32).toString('hex');
-    
+
     const accessTokenExpiresAt = new Date();
     accessTokenExpiresAt.setHours(accessTokenExpiresAt.getHours() + 1);
 
@@ -153,4 +155,29 @@ export const authenticateToken = (req: any, res: Response, next: any) => {
         req.user = user;
         next();
     })(req, res, next);
+};
+
+export const createSignUpCode = async (user: any) => {
+    let code = crypto.randomBytes(4).toString('hex').toUpperCase();
+    while (await SignUpCodes.findOne({ where: { code: code } })) {
+        code = crypto.randomBytes(4).toString('hex').toUpperCase();
+    }
+
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24); // Code expires in 24 hours
+
+    const operatorRole = await Role.findOne({
+        where: {
+            name: "travel_agency_operator"
+        }
+    });
+
+    const newCode = await SignUpCodes.create({
+        code,
+        roleId: operatorRole!.id || 2, // Assuming 2 is the operator role ID
+        expiresAt,
+        createdBy: user.id
+    });
+
+    return newCode;
 };

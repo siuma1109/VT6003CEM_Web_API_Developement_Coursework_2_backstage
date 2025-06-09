@@ -1,11 +1,14 @@
 import { Request, Response, RequestHandler } from 'express';
-import { generateTokens, refreshAccessToken, revokeTokens } from '../services/auth.service';
+import { generateTokens, refreshAccessToken, revokeTokens, createSignUpCode as generateSignUpCode } from '../services/auth.service';
 import { apiResponse } from '../utils/api-response.util';
 import { UserService } from '../services/user.service';
 import { handleException } from '../utils/model.util';
 import { PasswordService } from '../services/password.service';
 import { UserRepository } from '../repositories/user.repository';
 import { User } from '../models/user.model';
+import { SignUpCodes } from '../models/sign-up-codes.model';
+import { UsersRoles } from '../models/users-roles.model';
+import { Op } from 'sequelize';
 
 declare global {
     namespace Express {
@@ -17,7 +20,7 @@ declare global {
 
 export const register: RequestHandler = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, signUpCode } = req.body;
 
         // Check if user already exists
         const existingUser = await UserRepository.getByEmail(email);
@@ -26,18 +29,60 @@ export const register: RequestHandler = async (req: Request, res: Response): Pro
             return;
         }
 
-        // Create new user
-        const user = await UserService.create({
-            name, email, password
-        });
+        // Validate sign-up code if provided
+        if (signUpCode) {
+            const codeRecord = await SignUpCodes.findOne({
+                where: {
+                    code: signUpCode
+                }
+            });
 
-        // Generate tokens
-        const { accessToken, refreshToken } = await generateTokens(user.id);
-        const metaData = new Map();
-        metaData.set('accessToken', accessToken);
-        metaData.set('refreshToken', refreshToken);
-        
-        apiResponse(res, 201, 'User registered successfully', undefined, user, undefined, metaData);
+            if (!codeRecord || codeRecord.expiresAt < new Date()) {
+                apiResponse(res, 400, 'Invalid or expired sign-up code');
+                return;
+            }
+
+            // Create new user
+            const user = await UserService.create({
+                name,
+                email,
+                password
+            });
+
+            // Assign operator role
+            await UsersRoles.create({
+                userId: user.id,
+                roleId: codeRecord.roleId
+            });
+
+            // Delete the used code
+            await SignUpCodes.destroy({
+                where: { id: codeRecord.id }
+            });
+
+            // Generate tokens
+            const { accessToken, refreshToken } = await generateTokens(user.id);
+            const metaData = new Map();
+            metaData.set('accessToken', accessToken);
+            metaData.set('refreshToken', refreshToken);
+
+            apiResponse(res, 201, 'User registered successfully', undefined, user, undefined, metaData);
+        } else {
+            // Regular user registration without code
+            const user = await UserService.create({
+                name,
+                email,
+                password
+            });
+
+            // Generate tokens
+            const { accessToken, refreshToken } = await generateTokens(user.id);
+            const metaData = new Map();
+            metaData.set('accessToken', accessToken);
+            metaData.set('refreshToken', refreshToken);
+
+            apiResponse(res, 201, 'User registered successfully', undefined, user, undefined, metaData);
+        }
     } catch (error) {
         const errorResponse = handleException(error);
         apiResponse(res, 400, errorResponse.message, undefined, undefined, errorResponse.errors);
@@ -121,4 +166,16 @@ export const logout: RequestHandler = async (req: Request, res: Response): Promi
         const errorResponse = handleException(error);
         apiResponse(res, 500, 'Error logging out', undefined, undefined, errorResponse.errors);
     }
-}; 
+};
+
+export const createSignUpCode: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = req.user as User;
+        const newCode = await generateSignUpCode(user);
+        apiResponse(res, 201, 'Sign-up code created successfully', undefined, newCode);
+    } catch (error: any) {
+        console.log(error);
+        const errorResponse = handleException(error);
+        apiResponse(res, 500, 'Error creating sign-up code', undefined, undefined, errorResponse.errors);
+    }
+};

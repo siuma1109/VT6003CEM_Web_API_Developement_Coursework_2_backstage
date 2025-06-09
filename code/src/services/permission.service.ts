@@ -7,7 +7,7 @@ import { apiResponse } from '../utils/api-response.util';
 export const canAddUser = async (req: any, res: Response, next: any) => {
     try {
         const currentUser = req.user;
-        console.log('Current user:', currentUser);
+        //console.log('Current user:', currentUser);
         if (!currentUser) {
             return apiResponse(res, 401, 'Unauthorized', undefined, undefined, new Map([['error', 'User not authenticated']]));
         }
@@ -20,10 +20,10 @@ export const canAddUser = async (req: any, res: Response, next: any) => {
                 where: { name: 'admin' }
             }]
         });
-        
-        console.log('User role query result:', userRole);
+
+        //console.log('User role query result:', userRole);
         if (userRole) {
-            console.log('User has admin role');
+            //console.log('User has admin role');
             return next();
         }
 
@@ -32,7 +32,7 @@ export const canAddUser = async (req: any, res: Response, next: any) => {
             where: { userId: currentUser.id },
             include: [Role]
         });
-        console.log('All user roles:', allUserRoles);
+        //console.log('All user roles:', allUserRoles);
 
         return apiResponse(res, 403, 'You do not have permission to access this resource');
     } catch (error: any) {
@@ -74,3 +74,33 @@ export const canUpdateOrDeleteUser = async (req: any, res: Response, next: any) 
         return apiResponse(res, 403, 'You do not have permission to access this resource');
     }
 };
+
+export const isAdmin = async (req: any, res: Response, next: any) => {
+    try {
+        const currentUser = req.user;
+        //console.log('Current user:', currentUser);
+        if (!currentUser) {
+            return apiResponse(res, 401, 'Unauthorized', undefined, undefined, new Map([['error', 'User not authenticated']]));
+        }
+
+        // Check if user has admin role
+        const userRole = await UsersRoles.findOne({
+            where: { userId: currentUser.id },
+            include: [{
+                model: Role,
+                where: { name: 'admin' }
+            }]
+        });
+
+        //console.log('User role query result:', userRole);
+        if (userRole) {
+            console.log('User has admin role');
+            return next();
+        }
+
+        return apiResponse(res, 403, 'You do not have permission to access this resource');
+    } catch (error: any) {
+        console.error('Error checking permissions:', error);
+        return apiResponse(res, 403, 'You do not have permission to access this resource');
+    }
+}
