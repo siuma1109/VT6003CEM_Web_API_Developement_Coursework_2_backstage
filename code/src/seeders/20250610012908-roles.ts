@@ -40,6 +40,31 @@ module.exports = {
           adminUserId = adminUsers[0].id;
         }
 
+        // Create travel agency operator user if it doesn't exist
+        const [operatorUsers] = await queryInterface.sequelize.query(
+          `SELECT * FROM users WHERE email = 'operator@example.com' LIMIT 1`,
+          { transaction }
+        ) as [any[], any];
+
+        let operatorUserId;
+        if (!operatorUsers || operatorUsers.length === 0) {
+          const result = await queryInterface.bulkInsert('users', [{
+            name: 'Travel Agency Operator',
+            email: 'operator@example.com',
+            password: await PasswordService.hash('password123'),
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }], { transaction });
+          const [operatorUser] = await queryInterface.sequelize.query(
+            `SELECT * FROM users WHERE email = 'operator@example.com' LIMIT 1`,
+            { transaction }
+          ) as [any[], any];
+
+          operatorUserId = operatorUser[0].id;
+        } else {
+          operatorUserId = operatorUsers[0].id;
+        }
+
         // Get existing roles
         const [existingRoles] = await queryInterface.sequelize.query(
           `SELECT name FROM roles`,
@@ -65,7 +90,6 @@ module.exports = {
           { transaction }
         ) as [any[], any];
 
-
         if (adminRoles && adminRoles.length > 0) {
           const [usersRoles] = await queryInterface.sequelize.query(
             `SELECT * FROM users_roles WHERE "userId" = ${adminUserId} AND "roleId" = ${adminRoles[0].id} LIMIT 1`,
@@ -75,6 +99,25 @@ module.exports = {
             await queryInterface.bulkInsert('users_roles', [{
               userId: adminUserId,
               roleId: adminRoles[0].id
+            }], { transaction });
+          }
+        }
+
+        // Get operator role and create user-role association
+        const [operatorRoles] = await queryInterface.sequelize.query(
+          `SELECT id FROM roles WHERE name = 'travel_agency_operator' LIMIT 1`,
+          { transaction }
+        ) as [any[], any];
+
+        if (operatorRoles && operatorRoles.length > 0) {
+          const [usersRoles] = await queryInterface.sequelize.query(
+            `SELECT * FROM users_roles WHERE "userId" = ${operatorUserId} AND "roleId" = ${operatorRoles[0].id} LIMIT 1`,
+            { transaction }
+          ) as [any[], any];
+          if (usersRoles.length == 0) {
+            await queryInterface.bulkInsert('users_roles', [{
+              userId: operatorUserId,
+              roleId: operatorRoles[0].id
             }], { transaction });
           }
         }
