@@ -24,7 +24,6 @@ app.get('/', (req: Request, res: Response) => {
 
 app.listen(port, async () => {
   console.log(`Server is running at http://localhost:${port}`);
-  const db = await sequelize();
-  await db.authenticate();
+  await sequelize.authenticate();
   console.log('Database connected');
 });

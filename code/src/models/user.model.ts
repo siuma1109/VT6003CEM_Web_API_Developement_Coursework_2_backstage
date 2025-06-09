@@ -1,11 +1,21 @@
 import { Model, InferAttributes, InferCreationAttributes, DataTypes, CreationOptional } from '@sequelize/core';
-import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table, Unique, BeforeCreate } from '@sequelize/core/decorators-legacy';
+import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table, Unique, BeforeCreate, ValidateAttribute } from '@sequelize/core/decorators-legacy';
 
 const bcrypt = require('bcrypt');
 
 @Table({
     tableName: 'users',
     timestamps: true,
+    defaultScope: {
+        attributes: {
+            exclude: ['password']
+        }
+    },
+    scopes: {
+        withPassword: {
+            attributes: { include: ['password'] }
+        }
+    }
 })
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     @Attribute(DataTypes.INTEGER)
@@ -15,11 +25,24 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
 
     @Attribute(DataTypes.STRING)
     @NotNull
+    @ValidateAttribute({
+        notEmpty: {
+            msg: 'Name cannot be empty'
+        }
+    })
     declare name: string;
 
     @Attribute(DataTypes.STRING)
     @NotNull
     @Unique
+    @ValidateAttribute({
+        isEmail: {
+            msg: 'Please enter a valid email address'
+        },
+        notEmpty: {
+            msg: 'Email cannot be empty'
+        }
+    })
     declare email: string;
 
     @Attribute(DataTypes.STRING)
