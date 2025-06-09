@@ -4,7 +4,7 @@ import { QueryInterface, Transaction, DataTypes } from 'sequelize';
 module.exports = {
   up: (queryInterface: QueryInterface): Promise<void> => queryInterface.sequelize.transaction(
     async (transaction: Transaction) => {
-      await queryInterface.createTable('tokens', {
+      await queryInterface.createTable('user_tokens', {
         id: {
           type: DataTypes.INTEGER,
           autoIncrement: true,
@@ -48,15 +48,15 @@ module.exports = {
       });
 
       // Add indexes
-      await queryInterface.addIndex('tokens', ['userId'], { transaction });
-      await queryInterface.addIndex('tokens', ['accessToken'], { transaction });
-      await queryInterface.addIndex('tokens', ['refreshToken'], { transaction });
+      await queryInterface.addIndex('user_tokens', ['userId'], { transaction });
+      await queryInterface.addIndex('user_tokens', ['accessToken'], { transaction });
+      await queryInterface.addIndex('user_tokens', ['refreshToken'], { transaction });
     }
   ),
 
   down: (queryInterface: QueryInterface): Promise<void> => queryInterface.sequelize.transaction(
     async (transaction: Transaction) => {
-      await queryInterface.dropTable('tokens');
+      await queryInterface.dropTable('user_tokens');
     }
   )
 }; 

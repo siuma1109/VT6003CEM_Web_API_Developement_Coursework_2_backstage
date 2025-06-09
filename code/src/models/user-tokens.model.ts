@@ -3,10 +3,10 @@ import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table, BelongsTo } from 
 import { User } from './user.model';
 
 @Table({
-    tableName: 'tokens',
+    tableName: 'user_tokens',
     timestamps: true
 })
-export class Token extends Model<InferAttributes<Token>, InferCreationAttributes<Token>> {
+export class UserTokens extends Model<InferAttributes<UserTokens>, InferCreationAttributes<UserTokens>> {
     @Attribute(DataTypes.INTEGER)
     @PrimaryKey
     @AutoIncrement

@@ -3,7 +3,7 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as BearerStrategy } from 'passport-http-bearer';
 import bcrypt from 'bcrypt';
 import { User } from '../models/user.model';
-import { Token } from '../models/token.model';
+import { UserTokens } from '../models/user-tokens.model';
 import crypto from 'crypto';
 import { Response } from 'express';
 import { apiResponse } from '../utils/api-response.util';
@@ -40,7 +40,7 @@ export const initializePassport = () => {
     passport.use(new BearerStrategy(
         async (token, done) => {
             try {
-                const tokenRecord = await Token.findOne({
+                const tokenRecord = await UserTokens.findOne({
                     where: { accessToken: token },
                     include: [{
                         model: User,
@@ -75,7 +75,7 @@ export const generateTokens = async (userId: number): Promise<{ accessToken: str
     const refreshTokenExpiresAt = new Date();
     refreshTokenExpiresAt.setDate(refreshTokenExpiresAt.getDate() + 30); // Refresh token expires in 30 days
 
-    await Token.create({
+    await UserTokens.create({
         userId,
         accessToken,
         refreshToken,
@@ -87,7 +87,7 @@ export const generateTokens = async (userId: number): Promise<{ accessToken: str
 };
 
 export const refreshAccessToken = async (refreshToken: string): Promise<{ accessToken: string; refreshToken: string } | null> => {
-    const tokenRecord = await Token.findOne({
+    const tokenRecord = await UserTokens.findOne({
         where: { refreshToken }
     });
 
@@ -120,7 +120,7 @@ export const refreshAccessToken = async (refreshToken: string): Promise<{ access
 };
 
 export const revokeTokens = async (userId: number): Promise<void> => {
-    await Token.destroy({
+    await UserTokens.destroy({
         where: { userId }
     });
 };

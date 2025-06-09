@@ -1,6 +1,7 @@
 import { Router, RequestHandler } from 'express';
 import { UserController } from '../../controllers/user.controller';
 import { authenticateToken } from '../../services/auth.service';
+import { canAddUser, canUpdateOrDeleteUser } from '../../services/permission.service';
 
 const router = Router();
 
@@ -11,15 +12,15 @@ router.use(authenticateToken);
 router.get('/', UserController.getAllUsers as RequestHandler);
 
 // Get user by ID
-router.get('/:id', UserController.getUserById as RequestHandler);
+router.get('/:id', canUpdateOrDeleteUser, UserController.getUserById as RequestHandler);
 
 // Create new user
-router.post('/', UserController.createUser as RequestHandler);
+router.post('/', canAddUser, UserController.createUser as RequestHandler);
 
 // Update user
-router.put('/:id', UserController.updateUser as RequestHandler);
+router.put('/:id', canUpdateOrDeleteUser, UserController.updateUser as RequestHandler);
 
 // Delete user
-router.delete('/:id', UserController.deleteUser as RequestHandler);
+router.delete('/:id', canUpdateOrDeleteUser, UserController.deleteUser as RequestHandler);
 
 export default router;
