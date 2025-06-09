@@ -24,7 +24,7 @@ export const loadRoutes = (app: Router) => {
             
             // Extract route name from filename (e.g., users.route.ts -> users)
             const fileName = file.split('.')[0];
-            console.log(`api/${version}/${fileName}`);
+            //console.log(`api/${version}/${fileName}`);
             // Mount the route
             app.use(`/api/${version}/${fileName}`, route);
         });

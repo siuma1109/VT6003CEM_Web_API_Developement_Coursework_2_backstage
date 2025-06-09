@@ -1,8 +1,6 @@
 import { InferAttributes, InferCreationAttributes } from "@sequelize/core";
 import { User } from "../models/user.model";
 import { UserRepository } from "../repositories/user.repository";
-import { Request, Response } from "express";
-import { apiResponse } from "../utils/api-response.util";
 import { PaginatedResult } from "../utils/model.util";
 
 export const UserService = {
@@ -23,12 +21,26 @@ export const UserService = {
         }
         return user;
     },
-    create: async (user: InferCreationAttributes<User>) => {
-        const newUser = await UserRepository.create(user);
+    getByEmail: async (email: string): Promise<User | null> => {
+        const user = await UserRepository.getByEmail(email);
+        if (!user) {
+            return null;
+        }
+        return user;
+    },
+    getByEmailWithPassword: async (email: string): Promise<User | null> => {
+        const user = await UserRepository.getByEmailWithPassword(email);
+        if (!user) {
+            return null;
+        }
+        return user;
+    },
+    create: async (user: object) => {
+        const newUser = await UserRepository.create(user as InferAttributes<User>);
         return newUser;
     },
-    update: async (id: number, user: InferAttributes<User>) => {
-        const updatedUser = await UserRepository.update(id, user);
+    update: async (id: number, user: object) => {
+        const updatedUser = await UserRepository.update(id, user as InferAttributes<User>);
         return updatedUser;
     },
     delete: async (id: number) => {

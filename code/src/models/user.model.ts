@@ -1,5 +1,6 @@
 import { Model, InferAttributes, InferCreationAttributes, DataTypes, CreationOptional } from '@sequelize/core';
-import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table, Unique, BeforeCreate, ValidateAttribute } from '@sequelize/core/decorators-legacy';
+import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table, Unique, BeforeCreate, ValidateAttribute, HasMany } from '@sequelize/core/decorators-legacy';
+import { Token } from './token.model';
 
 const bcrypt = require('bcrypt');
 
@@ -12,7 +13,7 @@ const bcrypt = require('bcrypt');
         }
     },
     scopes: {
-        withPassword: {
+        password: {
             attributes: { include: ['password'] }
         }
     }
@@ -56,6 +57,11 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
     @Attribute(DataTypes.DATE)
     @NotNull
     declare updatedAt: CreationOptional<Date>;
+
+    @HasMany(() => Token, {
+        foreignKey: 'userId'
+    })
+    declare tokens?: Token[];
 
     @BeforeCreate
     static async hashPassword(instance: User) {

@@ -11,8 +11,9 @@ export const apiResponse = (
         current_page: number,
         last_page: number,
     },
-    data?: Model[] | Model,
+    data?: Model[] | Model | Object,
     errors?: Map<String, any>,
+    metaData?: Map<String, any>
 ): Response => {
     let result = new Map<string, any>();
     result.set('status', status);
@@ -34,6 +35,10 @@ export const apiResponse = (
 
     if(errors) {
         result.set('errors', errors);
+    }
+
+    if(metaData) {
+        result.set('metaData', Object.fromEntries(metaData));
     }
 
     return res.status(status).json(Object.fromEntries(result));

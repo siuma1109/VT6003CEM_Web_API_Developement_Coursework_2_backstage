@@ -14,7 +14,27 @@ export const UserRepository = {
     },
 
     getByIdWithPassword: async (id: number) => {
-        const user = await User.withScope('withPassword').findByPk(id);
+        const user = await User.withScope('password').findByPk(id);
+        if (!user) return null;
+        return user;
+    },
+
+    getByEmail: async (email: string) => {
+        const user = await User.findOne({
+            where: {
+                email
+            }
+        });
+        if (!user) return null;
+        return user;
+    },
+
+    getByEmailWithPassword: async (email: string) => {
+        const user = await User.withScope('password').findOne({
+            where: {
+                email
+            }
+        });
         if (!user) return null;
         return user;
     },

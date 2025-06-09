@@ -2,6 +2,7 @@ import { importModels, Sequelize } from '@sequelize/core';
 import config from '../configs/database.config';
 import { PostgresDialect } from '@sequelize/postgres';
 import { User } from '../models/user.model';
+import { Token } from '../models/token.model';
 
 // Create and export the Sequelize instance for the application
 const env = process.env.NODE_ENV || 'development';
@@ -17,7 +18,8 @@ const sequelize = new Sequelize({
   ssl: false,
   clientMinMessages: 'notice',
   models: [
-    User
+    User,
+    Token,
   ]
 });
 
