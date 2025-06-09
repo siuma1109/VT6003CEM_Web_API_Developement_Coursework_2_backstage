@@ -1,7 +1,7 @@
 services:
-  backend:
+  backend_app:
     image: node:latest
-    container_name: VT6003CEM_backend
+    container_name: VT6003CEM_backend_app
     restart: unless-stopped
     working_dir: /app
     volumes:
@@ -17,5 +17,24 @@ services:
     command: > 
       sh -c "
         npm install &&
+        npm run build &&
+        npm run migrate &&
         npm run dev
       "
+    depends_on:
+      - postgres_db
+  postgres_db:
+    image: postgres:latest
+    container_name: VT6003CEM_postgres_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=backstage
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
