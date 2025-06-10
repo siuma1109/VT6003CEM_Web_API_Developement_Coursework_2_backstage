@@ -712,7 +712,7 @@ export const swaggerDocument = {
                 }
             }
         },
-        '/api/v1/role': {
+        '/api/v1/roles': {
             get: {
                 tags: ['Roles'],
                 summary: 'Get all roles',
@@ -782,7 +782,7 @@ export const swaggerDocument = {
                 }
             }
         },
-        '/api/v1/role/{id}': {
+        '/api/v1/roles/{id}': {
             get: {
                 tags: ['Roles'],
                 summary: 'Get role by ID',
