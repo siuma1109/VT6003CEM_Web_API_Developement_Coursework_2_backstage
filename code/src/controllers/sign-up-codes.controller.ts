@@ -26,6 +26,10 @@ export class SignUpCodesController {
             }
 
             const code = await SignUpCodesController.service.generateCode(roleId, user.id);
+            if (!code) {
+                apiResponse(res, 500, 'Failed to generate sign-up code');
+                return;
+            }
             apiResponse(res, 201, 'Sign-up code generated successfully', undefined, code);
         } catch (error: any) {
             apiResponse(res, 500, 'Error generating sign-up code', undefined, undefined, error.message);

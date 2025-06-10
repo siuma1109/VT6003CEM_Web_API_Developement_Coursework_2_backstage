@@ -179,5 +179,14 @@ export const createSignUpCode = async (user: any) => {
         createdBy: user.id
     });
 
-    return newCode;
+    // Fetch the created code with its associated role
+    const codeWithRole = await SignUpCodes.findOne({
+        where: { id: newCode.id },
+        include: [{
+            model: Role,
+            required: true
+        }]
+    });
+
+    return codeWithRole;
 };

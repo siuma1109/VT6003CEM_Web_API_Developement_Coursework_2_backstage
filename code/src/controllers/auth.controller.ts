@@ -172,6 +172,10 @@ export const createSignUpCode: RequestHandler = async (req: Request, res: Respon
     try {
         const user = req.user as User;
         const newCode = await generateSignUpCode(user);
+        if (!newCode) {
+            apiResponse(res, 500, 'Failed to create sign-up code');
+            return;
+        }
         apiResponse(res, 201, 'Sign-up code created successfully', undefined, newCode);
     } catch (error: any) {
         console.log(error);

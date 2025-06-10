@@ -8,10 +8,18 @@ export class SignUpCodesService {
         this.repository = new SignUpCodesRepository();
     }
 
+    /**
+     * Get all sign-up codes with their associated role and creator information
+     */
     async getAllCodes() {
         return await this.repository.findAll();
     }
 
+    /**
+     * Generate a new sign-up code with role and creator information
+     * @param roleId The ID of the role to assign
+     * @param createdBy The ID of the user creating the code
+     */
     async generateCode(roleId: number, createdBy: number) {
         // Generate a random 8-character code
         const code = randomBytes(4).toString('hex').toUpperCase();
@@ -28,6 +36,10 @@ export class SignUpCodesService {
         });
     }
 
+    /**
+     * Validate a sign-up code and return it with role information if valid
+     * @param code The code to validate
+     */
     async validateCode(code: string) {
         const signUpCode = await this.repository.findByCode(code);
         

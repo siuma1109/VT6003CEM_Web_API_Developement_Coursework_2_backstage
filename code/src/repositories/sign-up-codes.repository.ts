@@ -36,7 +36,20 @@ export class SignUpCodesRepository {
         expiresAt: Date;
         createdBy: number;
     }) {
-        return await SignUpCodes.create(data);
+        const signUpCode = await SignUpCodes.create(data);
+        return await SignUpCodes.findOne({
+            where: { id: signUpCode.id },
+            include: [
+                {
+                    model: Role,
+                    attributes: ['name']
+                },
+                {
+                    model: User,
+                    attributes: ['name', 'email']
+                }
+            ]
+        });
     }
 
     async delete(id: number) {
