@@ -6,6 +6,7 @@ import { UserTokens } from '../models/user-tokens.model';
 import { UsersRoles } from '../models/users-roles.model';
 import { Role } from '../models/role.model';
 import { SignUpCodes } from '../models/sign-up-codes.model';
+import { Hotel } from '../models/hotel.model';
 
 // Create and export the Sequelize instance for the application
 const env = process.env.NODE_ENV || 'development';
@@ -26,6 +27,7 @@ const sequelize = new Sequelize({
     Role,
     UsersRoles,
     SignUpCodes,
+    Hotel,
   ]
 });
 
