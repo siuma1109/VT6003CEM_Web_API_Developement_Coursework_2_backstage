@@ -3,6 +3,7 @@ import { User } from '../models/user.model';
 import { UsersRoles } from '../models/users-roles.model';
 import { Role } from '../models/role.model';
 import { apiResponse } from '../utils/api-response.util';
+import { Op } from 'sequelize';
 
 export const canAddUser = async (req: any, res: Response, next: any) => {
     try {
@@ -104,3 +105,34 @@ export const isAdmin = async (req: any, res: Response, next: any) => {
         return apiResponse(res, 403, 'You do not have permission to access this resource');
     }
 }
+
+export const canManageHotels = async (req: any, res: Response, next: any) => {
+    try {
+        const currentUser = req.user;
+        if (!currentUser) {
+            return apiResponse(res, 401, 'Unauthorized', undefined, undefined, new Map([['error', 'User not authenticated']]));
+        }
+
+        // Check if user has admin or travel_agency_operator role
+        const userRole = await UsersRoles.findOne({
+            where: { userId: currentUser.id },
+            include: [{
+                model: Role,
+                where: {
+                    name: {
+                        [Op.in]: ['admin', 'travel_agency_operator']
+                    }
+                }
+            }]
+        });
+
+        if (userRole) {
+            return next();
+        }
+
+        return apiResponse(res, 403, 'You do not have permission to manage hotels');
+    } catch (error: any) {
+        console.error('Error checking hotel permissions:', error);
+        return apiResponse(res, 403, 'You do not have permission to manage hotels');
+    }
+};
