@@ -711,6 +711,195 @@ export const swaggerDocument = {
                     }
                 }
             }
+        },
+        '/api/v1/role': {
+            get: {
+                tags: ['Roles'],
+                summary: 'Get all roles',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: 'List of roles',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        status: { type: 'number' },
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            type: 'array',
+                                            items: { $ref: '#/components/schemas/Role' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    401: { description: 'Unauthorized' },
+                    403: { description: 'Forbidden - Admin access required' }
+                }
+            },
+            post: {
+                tags: ['Roles'],
+                summary: 'Create a new role',
+                security: [{ bearerAuth: [] }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['name'],
+                                properties: {
+                                    name: { type: 'string' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    201: {
+                        description: 'Role created successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        status: { type: 'number' },
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: { $ref: '#/components/schemas/Role' }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    400: { description: 'Bad request - Role name already exists' },
+                    401: { description: 'Unauthorized' },
+                    403: { description: 'Forbidden - Admin access required' }
+                }
+            }
+        },
+        '/api/v1/role/{id}': {
+            get: {
+                tags: ['Roles'],
+                summary: 'Get role by ID',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: { type: 'integer' }
+                    }
+                ],
+                responses: {
+                    200: {
+                        description: 'Role details',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        status: { type: 'number' },
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: { $ref: '#/components/schemas/Role' }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    401: { description: 'Unauthorized' },
+                    403: { description: 'Forbidden - Admin access required' },
+                    404: { description: 'Role not found' }
+                }
+            },
+            put: {
+                tags: ['Roles'],
+                summary: 'Update a role',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: { type: 'integer' }
+                    }
+                ],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['name'],
+                                properties: {
+                                    name: { type: 'string' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    200: {
+                        description: 'Role updated successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        status: { type: 'number' },
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: { $ref: '#/components/schemas/Role' }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    400: { description: 'Bad request - Role name already exists' },
+                    401: { description: 'Unauthorized' },
+                    403: { description: 'Forbidden - Admin access required' },
+                    404: { description: 'Role not found' }
+                }
+            },
+            delete: {
+                tags: ['Roles'],
+                summary: 'Delete a role',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: { type: 'integer' }
+                    }
+                ],
+                responses: {
+                    200: {
+                        description: 'Role deleted successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        status: { type: 'number' },
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    400: { description: 'Bad request - Cannot delete system roles' },
+                    401: { description: 'Unauthorized' },
+                    403: { description: 'Forbidden - Admin access required' },
+                    404: { description: 'Role not found' }
+                }
+            }
         }
     }
 };
