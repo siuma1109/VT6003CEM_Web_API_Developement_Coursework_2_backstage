@@ -96,6 +96,54 @@ export const swaggerDocument = {
                 },
             },
         },
+        '/api/v1/auth/check-email-exists': {
+            post: {
+                tags: ['Authentication'],
+                summary: 'Check if an email exists in the system',
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['email'],
+                                properties: {
+                                    email: { type: 'string', format: 'email' },
+                                },
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: 'Email check completed',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            type: 'object',
+                                            properties: {
+                                                exists: { type: 'boolean' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    400: {
+                        description: 'Email is required'
+                    },
+                    500: {
+                        description: 'Server error'
+                    }
+                }
+            }
+        },
         '/api/v1/hotels': {
             get: {
                 tags: ['Hotels'],
@@ -276,7 +324,7 @@ export const swaggerDocument = {
         '/api/v1/users/{id}': {
             get: {
                 tags: ['Users'],
-                summary: 'Get user by ID',
+                summary: 'Get user by ID or get current user profile',
                 security: [{ bearerAuth: [] }],
                 parameters: [
                     {
@@ -286,23 +334,43 @@ export const swaggerDocument = {
                         schema: {
                             type: 'string',
                         },
+                        description: 'User ID or "me" to get current user profile'
                     },
                 ],
                 responses: {
                     200: {
-                        description: 'User details',
+                        description: 'User details retrieved successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            type: 'object',
+                                            properties: {
+                                                id: { type: 'integer' },
+                                                name: { type: 'string' },
+                                                email: { type: 'string' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     401: {
-                        description: 'Unauthorized',
+                        description: 'Unauthorized - User not authenticated'
                     },
                     404: {
-                        description: 'User not found',
-                    },
-                },
+                        description: 'User not found'
+                    }
+                }
             },
             put: {
                 tags: ['Users'],
-                summary: 'Update user',
+                summary: 'Update user by ID or update current user profile',
                 security: [{ bearerAuth: [] }],
                 parameters: [
                     {
@@ -312,7 +380,8 @@ export const swaggerDocument = {
                         schema: {
                             type: 'string',
                         },
-                    },
+                        description: 'User ID or "me" to update current user profile'
+                    }
                 ],
                 requestBody: {
                     required: true,
@@ -321,24 +390,45 @@ export const swaggerDocument = {
                             schema: {
                                 type: 'object',
                                 properties: {
-                                    name: { type: 'string' },
-                                    email: { type: 'string', format: 'email' },
-                                },
-                            },
-                        },
-                    },
+                                    name: { type: 'string' }
+                                }
+                            }
+                        }
+                    }
                 },
                 responses: {
                     200: {
                         description: 'User updated successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            type: 'object',
+                                            properties: {
+                                                id: { type: 'integer' },
+                                                name: { type: 'string' },
+                                                email: { type: 'string' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     401: {
-                        description: 'Unauthorized',
+                        description: 'Unauthorized - User not authenticated'
                     },
                     404: {
-                        description: 'User not found',
+                        description: 'User not found'
                     },
-                },
+                    400: {
+                        description: 'Invalid input data'
+                    }
+                }
             },
             delete: {
                 tags: ['Users'],

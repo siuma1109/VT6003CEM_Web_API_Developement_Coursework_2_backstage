@@ -10,8 +10,8 @@ export class HotelService {
         this.repository = new HotelRepository();
     }
 
-    async getAllHotels(page: number, limit: number): Promise<PaginatedResult<Hotel>> {
-        return await this.repository.paginate(page, limit);
+    async getAllHotels(page: number, limit: number, search: string): Promise<PaginatedResult<Hotel>> {
+        return await this.repository.paginate(page, limit, search);
     }
 
     async getHotelById(id: number) {

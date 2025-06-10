@@ -9,8 +9,17 @@ export class HotelRepository {
         return await Hotel.findAll(options);
     }
 
-    async paginate(page: number, limit: number): Promise<PaginatedResult<Hotel>> {
-        return await paginate(Hotel, page, limit);
+    async paginate(page: number, limit: number, search: string): Promise<PaginatedResult<Hotel>> {
+        const options = search ? {
+            where: {
+                [Op.or]: [
+                    { name: { [Op.iLike]: `%${search.toLowerCase()}%` } },
+                    { description: { [Op.iLike]: `%${search.toLowerCase()}%` } },
+                    { city: { [Op.iLike]: `%${search.toLowerCase()}%` } }
+                ]
+            }
+        } : {};
+        return await paginate(Hotel, page, limit, options);
     }
 
     async findById(id: number) {

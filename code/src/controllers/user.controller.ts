@@ -14,11 +14,19 @@ export class UserController {
     }
 
     static async getUserById(req: Request, res: Response) {
-        const user = await UserService.getById(parseInt(req.params.id));
-        if (!user) {
+        let id = req.params.id;
+        if(id == 'me') {
+            const user = req.user as User;
+            if (!user) {
+                return apiResponse(res, 401, 'User not authenticated');
+            }
+            id = user.id.toString();
+        }
+        const retrieveUser = await UserService.getById(parseInt(id));
+        if (!retrieveUser) {
             return apiResponse(res, 404, 'User not found');
         }
-        apiResponse(res, 200, 'User fetched successfully', undefined, user);
+        apiResponse(res, 200, 'User fetched successfully', undefined, retrieveUser);
     }
 
     static async getUserByEmail(req: Request, res: Response) {
@@ -41,10 +49,17 @@ export class UserController {
     }
 
     static async updateUser(req: Request, res: Response) {
-        const id = parseInt(req.params.id);
+        let id = req.params.id;
+        if(id == 'me') {
+            const user = req.user as User;
+            if (!user) {
+                return apiResponse(res, 401, 'User not authenticated');
+            }
+            id = user.id.toString();
+        }
         const { name } = req.body;
         try {
-            const updatedUser = await UserService.update(id, { name } as InferAttributes<User>);
+            const updatedUser = await UserService.update(parseInt(id), { name } as InferAttributes<User>);
             if (!updatedUser) {
                 return apiResponse(res, 404, 'User not found');
             }
@@ -63,6 +78,36 @@ export class UserController {
                 return apiResponse(res, 404, 'User not found');
             }
             apiResponse(res, 204, 'User deleted');
+        } catch (error: any) {
+            const errorResponse = handleException(error);
+            apiResponse(res, 400, errorResponse.message, undefined, undefined, errorResponse.errors);
+        }
+    }
+
+    static async getProfile(req: Request, res: Response) {
+        const user = req.user as User;
+        if (!user) {
+            return apiResponse(res, 401, 'User not authenticated');
+        }
+        const returnUser = await UserService.getById(user.id);
+        if (!user) {
+            return apiResponse(res, 404, 'User not found');
+        }
+        apiResponse(res, 200, 'Profile fetched successfully', undefined, user);
+    }
+
+    static async updateProfile(req: Request, res: Response) {
+        const user = req.user as User;
+        if (!user) {
+            return apiResponse(res, 401, 'User not authenticated');
+        }
+        const { name } = req.body;
+        try {
+            const updatedUser = await UserService.update(user.id, { name } as InferAttributes<User>);
+            if (!updatedUser) {
+                return apiResponse(res, 404, 'User not found');
+            }
+            apiResponse(res, 200, 'Profile updated successfully', undefined, updatedUser);
         } catch (error: any) {
             const errorResponse = handleException(error);
             apiResponse(res, 400, errorResponse.message, undefined, undefined, errorResponse.errors);

@@ -45,7 +45,14 @@ export const canAddUser = async (req: any, res: Response, next: any) => {
 
 export const canUpdateOrDeleteUser = async (req: any, res: Response, next: any) => {
     try {
-        const targetUserId = parseInt(req.params.id);
+        let targetUserId = req.params.id;
+        if(targetUserId === 'me') {
+            const user = req.user as User;
+            if (!user) {
+                return apiResponse(res, 401, 'User not authenticated');
+            }
+            targetUserId = user.id;
+        }
         const currentUser = req.user;
 
         if (!currentUser) {
@@ -53,7 +60,7 @@ export const canUpdateOrDeleteUser = async (req: any, res: Response, next: any) 
         }
 
         // Check if user is accessing their own data
-        if (currentUser.id === targetUserId) {
+        if (currentUser.id === Number(targetUserId)) {
             return next();
         }
 

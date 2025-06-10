@@ -13,7 +13,8 @@ export class HotelController {
         try {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
-            const result = await this.service.getAllHotels(page, limit);
+            const search = req.query.search as string;
+            const result = await this.service.getAllHotels(page, limit, search);
             apiResponse(res, 200, 'Hotels retrieved successfully', result.paginate, result.data);
         } catch (error: any) {
             apiResponse(res, 500, 'Error retrieving hotels', undefined, undefined, error.message);

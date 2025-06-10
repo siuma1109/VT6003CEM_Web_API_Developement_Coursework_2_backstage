@@ -179,3 +179,20 @@ export const createSignUpCode: RequestHandler = async (req: Request, res: Respon
         apiResponse(res, 500, 'Error creating sign-up code', undefined, undefined, errorResponse.errors);
     }
 };
+
+export const checkEmailExists: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { email } = req.body;
+        
+        if (!email) {
+            apiResponse(res, 400, 'Email is required');
+            return;
+        }
+
+        const user = await UserService.getByEmail(email);
+        apiResponse(res, 200, 'Email check completed', undefined, { exists: !!user });
+    } catch (error) {
+        const errorResponse = handleException(error);
+        apiResponse(res, 500, 'Error checking email', undefined, undefined, errorResponse.errors);
+    }
+};
