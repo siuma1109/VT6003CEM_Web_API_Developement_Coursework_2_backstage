@@ -586,6 +586,132 @@ export const swaggerDocument = {
                 }
             }
         },
+        '/api/v1/sign-up-codes': {
+            get: {
+                tags: ['Sign-up Codes'],
+                summary: 'Get all sign-up codes',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: 'List of sign-up codes',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            type: 'array',
+                                            items: {
+                                                $ref: '#/components/schemas/SignUpCode'
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    401: {
+                        description: 'Unauthorized'
+                    },
+                    403: {
+                        description: 'Forbidden - Admin access required'
+                    }
+                }
+            }
+        },
+        '/api/v1/sign-up-codes/generate': {
+            post: {
+                tags: ['Sign-up Codes'],
+                summary: 'Generate a new sign-up code',
+                security: [{ bearerAuth: [] }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['roleId'],
+                                properties: {
+                                    roleId: { type: 'integer' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    201: {
+                        description: 'Sign-up code generated successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            $ref: '#/components/schemas/SignUpCode'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    400: {
+                        description: 'Invalid input'
+                    },
+                    401: {
+                        description: 'Unauthorized'
+                    },
+                    403: {
+                        description: 'Forbidden - Admin access required'
+                    }
+                }
+            }
+        },
+        '/api/v1/sign-up-codes/validate': {
+            post: {
+                tags: ['Sign-up Codes'],
+                summary: 'Validate a sign-up code',
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['code'],
+                                properties: {
+                                    code: { type: 'string' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    200: {
+                        description: 'Code is valid',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            $ref: '#/components/schemas/SignUpCode'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    400: {
+                        description: 'Invalid or expired code'
+                    }
+                }
+            }
+        }
     }
 };
 
