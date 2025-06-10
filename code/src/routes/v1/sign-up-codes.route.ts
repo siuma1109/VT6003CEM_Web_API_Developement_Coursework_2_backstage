@@ -11,6 +11,7 @@ router.use(authenticateToken);
 // Admin routes
 router.get('/', isAdmin, SignUpCodesController.getAllCodes as RequestHandler);
 router.post('/generate', isAdmin, SignUpCodesController.generateCode as RequestHandler);
+router.delete('/:id', isAdmin, SignUpCodesController.deleteCode as RequestHandler);
 
 // Public route for code validation
 router.post('/validate', SignUpCodesController.validateCode as RequestHandler);

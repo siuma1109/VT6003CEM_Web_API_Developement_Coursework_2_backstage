@@ -54,4 +54,8 @@ export class SignUpCodesService {
 
         return signUpCode;
     }
+
+    async deleteCode(id: number) {
+        return await this.repository.delete(id);
+    }
 } 

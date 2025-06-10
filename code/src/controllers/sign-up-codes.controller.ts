@@ -57,4 +57,26 @@ export class SignUpCodesController {
             apiResponse(res, 500, 'Error validating sign-up code', undefined, undefined, error.message);
         }
     }
+
+    static async deleteCode(req: Request, res: Response): Promise<void> {
+        try {
+            const { id } = req.params;
+            
+            if (!id) {
+                apiResponse(res, 400, 'Code ID is required');
+                return;
+            }
+
+            const success = await SignUpCodesController.service.deleteCode(parseInt(id));
+            
+            if (!success) {
+                apiResponse(res, 404, 'Sign-up code not found');
+                return;
+            }
+
+            apiResponse(res, 200, 'Sign-up code deleted successfully');
+        } catch (error: any) {
+            apiResponse(res, 500, 'Error deleting sign-up code', undefined, undefined, error.message);
+        }
+    }
 } 

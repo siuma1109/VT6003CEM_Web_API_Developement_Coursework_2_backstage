@@ -711,6 +711,52 @@ export const swaggerDocument = {
                     }
                 }
             }
+        },
+        '/api/v1/sign-up-codes/{id}': {
+            delete: {
+                tags: ['Sign-up Codes'],
+                summary: 'Delete a sign-up code',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: {
+                            type: 'integer'
+                        },
+                        description: 'ID of the sign-up code to delete'
+                    }
+                ],
+                responses: {
+                    200: {
+                        description: 'Sign-up code deleted successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    400: {
+                        description: 'Code ID is required'
+                    },
+                    401: {
+                        description: 'Unauthorized'
+                    },
+                    403: {
+                        description: 'Forbidden - Admin access required'
+                    },
+                    404: {
+                        description: 'Sign-up code not found'
+                    }
+                }
+            }
         }
     }
 };
