@@ -5,6 +5,8 @@ import cors from 'cors';
 import sequelize from './services/database.sevice';
 import passport from 'passport';
 import { initializePassport } from './services/auth.service';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerDocument } from './configs/swagger';
 
 //For env File 
 dotenv.config();
@@ -21,6 +23,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 initializePassport();
 
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 // Load all routes
 loadRoutes(app);
 
@@ -30,6 +35,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.listen(port, async () => {
   console.log(`Server is running at http://localhost:${port}`);
+  console.log(`API Documentation available at http://localhost:${port}/api-docs`);
   await sequelize.authenticate();
   console.log('Database connected');
 });
