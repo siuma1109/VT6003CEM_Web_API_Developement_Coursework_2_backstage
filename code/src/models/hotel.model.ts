@@ -1,5 +1,5 @@
 import { Model, InferAttributes, InferCreationAttributes, DataTypes, CreationOptional } from '@sequelize/core';
-import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table } from '@sequelize/core/decorators-legacy';
+import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table, BeforeCreate } from '@sequelize/core/decorators-legacy';
 
 @Table({
     tableName: 'hotels',
@@ -12,7 +12,6 @@ export class Hotel extends Model<InferAttributes<Hotel>, InferCreationAttributes
     declare id: CreationOptional<number>;
 
     @Attribute(DataTypes.INTEGER)
-    @NotNull
     declare hotelBedsId: number;
 
     @Attribute(DataTypes.STRING)
@@ -66,11 +65,9 @@ export class Hotel extends Model<InferAttributes<Hotel>, InferCreationAttributes
     declare images: CreationOptional<string[]>;
 
     @Attribute(DataTypes.DATE)
-    @NotNull
     declare lastUpdated: CreationOptional<Date>;
 
     @Attribute(DataTypes.ENUM('pending', 'active', 'inactive'))
-    @NotNull
     declare status: CreationOptional<'pending' | 'active' | 'inactive'>;
 
     @Attribute(DataTypes.JSON)

@@ -12,7 +12,7 @@ module.exports = {
         },
         hotelBedsId: {
           type: DataTypes.INTEGER,
-          allowNull: false,
+          allowNull: true,
           unique: true,
           comment: 'Hotel ID from Hotelbeds API'
         },
@@ -80,7 +80,7 @@ module.exports = {
         },
         lastUpdated: {
           type: DataTypes.DATE,
-          allowNull: false,
+          allowNull: true,
           defaultValue: DataTypes.NOW,
           comment: 'Last time the hotel data was updated from API'
         },

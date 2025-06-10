@@ -20,32 +20,49 @@ export class HotelService {
 
     async createHotel(hotelData: InferCreationAttributes<Hotel>) {
         // Validate required fields
-        if (!hotelData.name || !hotelData.hotelBedsId || !hotelData.email) {
-            throw new Error('Missing required fields: name, hotelBedsId, and email are required');
+        if (!hotelData.name || !hotelData.email) {
+            throw new Error('Missing required fields: name, and email are required');
         }
 
         // Check if hotel with same hotelBedsId already exists
-        const existingHotel = await this.repository.findByHotelBedsId(hotelData.hotelBedsId);
-        if (existingHotel) {
-            throw new Error('Hotel with this HotelBeds ID already exists');
+        if (hotelData.hotelBedsId) {
+            const existingHotel = await this.repository.findByHotelBedsId(hotelData.hotelBedsId);
+            if (existingHotel) {
+                throw new Error('Hotel with this HotelBeds ID already exists');
+            }
         }
 
         return await this.repository.create(hotelData);
     }
 
-    async updateHotel(id: number, customData: Partial<Hotel['customData']>) {
+    async updateHotel(id: number, updateData: Partial<Hotel>) {
         const hotel = await this.repository.findById(id);
         if (!hotel) {
             throw new Error('Hotel not found');
         }
 
-        // Only update the customData field
-        return await this.repository.update(id, {
-            customData: {
+        // If hotelBedsId is null, allow full field updates
+        if (!hotel.hotelBedsId) {
+            return await this.repository.update(id, updateData);
+        }
+
+        // For hotels synced with HotelBeds, only allow status and customData updates
+        const updateFields: any = {};
+        
+        // Only allow status update if provided
+        if (updateData.status) {
+            updateFields.status = updateData.status;
+        }
+
+        // Only allow customData update if provided
+        if (updateData.customData) {
+            updateFields.customData = {
                 ...hotel.customData,
-                ...customData
-            }
-        });
+                ...updateData.customData
+            };
+        }
+
+        return await this.repository.update(id, updateFields);
     }
 
     async deleteHotel(id: number) {
