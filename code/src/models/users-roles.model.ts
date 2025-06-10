@@ -1,7 +1,5 @@
 import { Model, InferAttributes, InferCreationAttributes, DataTypes, CreationOptional } from '@sequelize/core';
-import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table, BelongsTo } from '@sequelize/core/decorators-legacy';
-import { User } from './user.model';
-import {Role} from './role.model';
+import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table } from '@sequelize/core/decorators-legacy';
 
 @Table({
     tableName: 'users_roles',
@@ -18,14 +16,4 @@ export class UsersRoles extends Model<InferAttributes<UsersRoles>, InferCreation
     @PrimaryKey
     @NotNull
     declare roleId: number;
-
-    @BelongsTo(() => User, {
-        foreignKey: 'userId'
-    })
-    declare user?: User;
-
-    @BelongsTo(() => Role, {
-        foreignKey: 'roleId'
-    })
-    declare role?: Role;
 }

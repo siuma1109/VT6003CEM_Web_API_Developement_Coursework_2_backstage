@@ -1,5 +1,7 @@
 import { Model, InferAttributes, InferCreationAttributes, DataTypes, CreationOptional } from '@sequelize/core';
-import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table, ValidateAttribute } from '@sequelize/core/decorators-legacy';
+import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table, ValidateAttribute, BelongsToMany } from '@sequelize/core/decorators-legacy';
+import { User } from './user.model';
+import { UsersRoles } from './users-roles.model';
 
 @Table({
     tableName: 'roles',
@@ -27,4 +29,11 @@ export class Role extends Model<InferAttributes<Role>, InferCreationAttributes<R
     @Attribute(DataTypes.DATE)
     @NotNull
     declare updatedAt: CreationOptional<Date>;
+
+    @BelongsToMany(() => User, {
+        through: UsersRoles,
+        foreignKey: 'roleId',
+        otherKey: 'userId'
+    })
+    declare users?: User[];
 }

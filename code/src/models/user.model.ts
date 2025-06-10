@@ -1,6 +1,8 @@
 import { Model, InferAttributes, InferCreationAttributes, DataTypes, CreationOptional } from '@sequelize/core';
-import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table, Unique, BeforeCreate, ValidateAttribute, HasMany } from '@sequelize/core/decorators-legacy';
+import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table, Unique, BeforeCreate, ValidateAttribute, HasMany, BelongsToMany } from '@sequelize/core/decorators-legacy';
 import { UserTokens } from './user-tokens.model';
+import { Role } from './role.model';
+import { UsersRoles } from './users-roles.model';
 
 const bcrypt = require('bcrypt');
 
@@ -62,6 +64,13 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
         foreignKey: 'userId'
     })
     declare tokens?: UserTokens[];
+
+    @BelongsToMany(() => Role, {
+        through: UsersRoles,
+        foreignKey: 'userId',
+        otherKey: 'roleId'
+    })
+    declare roles?: Role[];
 
     @BeforeCreate
     static async hashPassword(instance: User) {
