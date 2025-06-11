@@ -189,7 +189,7 @@ export class UserController {
         try {
             const user = req.user as User;
             const userId = user?.id;
-            const { hotelId } = req.body;
+            const hotelId = req.body.hotelId || req.params.hotelId;
 
             if (!userId) {
                 return apiResponse(res, 401, 'User not authenticated');
@@ -281,7 +281,7 @@ export class UserController {
         try {
             const user = req.user as User;
             const userId = user?.id;
-            const { hotelId } = req.body;
+            const { hotelId } = req.query;
 
             if (!userId) {
                 return apiResponse(res, 401, 'User not authenticated');
@@ -292,7 +292,7 @@ export class UserController {
             }
 
             const favourite = await UsersHotelsFavourites.findOne({
-                where: { userId, hotelId }
+                where: { userId, hotelId: Number(hotelId) }
             });
 
             apiResponse(res, 200, 'Favorite status checked successfully', undefined, { isFavourite: !!favourite });
