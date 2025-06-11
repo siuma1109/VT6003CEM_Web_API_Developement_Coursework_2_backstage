@@ -267,7 +267,7 @@ export class UserController {
                 where: { userId },
                 include: [{
                     model: Hotel,
-                    attributes: ['id', 'name', 'description', 'address']
+                    attributes: ['id', 'name', 'description', 'address', 'images']
                 }]
             });
             apiResponse(res, 200, 'Favorites retrieved successfully', undefined, favourites);
