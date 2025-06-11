@@ -457,6 +457,75 @@ export const swaggerDocument = {
                 },
             },
         },
+        '/api/v1/users/{id}/avatar': {
+            post: {
+                tags: ['Users'],
+                summary: 'Upload user avatar',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: {
+                            type: 'string',
+                        },
+                        description: 'User ID or "me" to upload avatar for current user'
+                    }
+                ],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'multipart/form-data': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    avatar: {
+                                        type: 'string',
+                                        format: 'binary',
+                                        description: 'Image file (JPEG, PNG, GIF, or WebP)'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    200: {
+                        description: 'Avatar uploaded successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            type: 'object',
+                                            properties: {
+                                                id: { type: 'integer' },
+                                                name: { type: 'string' },
+                                                email: { type: 'string' },
+                                                avatar: { type: 'string' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    400: {
+                        description: 'Invalid file type or size'
+                    },
+                    401: {
+                        description: 'Unauthorized - User not authenticated'
+                    },
+                    404: {
+                        description: 'User not found'
+                    }
+                }
+            }
+        },
         '/api/v1/hotel-beds/check-status': {
             get: {
                 tags: ['Hotelbeds'],
