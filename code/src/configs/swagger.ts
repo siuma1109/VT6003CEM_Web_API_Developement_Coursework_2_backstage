@@ -276,6 +276,97 @@ export const swaggerDocument = {
                     },
                 },
             },
+            '/api/v1/hotels/{hotelId}/chat-room': {
+                get: {
+                    tags: ['Chat Rooms'],
+                    summary: 'Get or create a chat room for a hotel and user',
+                    security: [{ bearerAuth: [] }],
+                    parameters: [
+                        {
+                            name: 'hotelId',
+                            in: 'path',
+                            required: true,
+                            schema: {
+                                type: 'integer'
+                            },
+                            description: 'ID of the hotel'
+                        }
+                    ],
+                    responses: {
+                        200: {
+                            description: 'Chat room retrieved or created successfully',
+                            content: {
+                                'application/json': {
+                                    schema: {
+                                        type: 'object',
+                                        properties: {
+                                            success: { type: 'boolean' },
+                                            message: { type: 'string' },
+                                            data: {
+                                                type: 'object',
+                                                properties: {
+                                                    id: { type: 'integer' },
+                                                    userId: { type: 'integer' },
+                                                    hotelId: { type: 'integer' },
+                                                    newMessageTime: { type: 'string', format: 'date-time' },
+                                                    createdAt: { type: 'string', format: 'date-time' },
+                                                    updatedAt: { type: 'string', format: 'date-time' },
+                                                    hotel: {
+                                                        type: 'object',
+                                                        properties: {
+                                                            id: { type: 'integer' },
+                                                            name: { type: 'string' },
+                                                            images: { type: 'array', items: { type: 'string' } }
+                                                        }
+                                                    },
+                                                    user: {
+                                                        type: 'object',
+                                                        properties: {
+                                                            id: { type: 'integer' },
+                                                            name: { type: 'string' },
+                                                            email: { type: 'string' },
+                                                            avatar: { type: 'string' }
+                                                        }
+                                                    },
+                                                    messages: {
+                                                        type: 'array',
+                                                        items: {
+                                                            type: 'object',
+                                                            properties: {
+                                                                id: { type: 'integer' },
+                                                                content: { type: 'string' },
+                                                                senderId: { type: 'integer' },
+                                                                createdAt: { type: 'string', format: 'date-time' },
+                                                                sender: {
+                                                                    type: 'object',
+                                                                    properties: {
+                                                                        id: { type: 'integer' },
+                                                                        name: { type: 'string' },
+                                                                        email: { type: 'string' }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        401: {
+                            description: 'Unauthorized - User not authenticated'
+                        },
+                        404: {
+                            description: 'Chat room not found'
+                        },
+                        500: {
+                            description: 'Server error'
+                        }
+                    }
+                }
+            }
         },
         '/api/v1/users': {
             get: {
@@ -1214,6 +1305,469 @@ export const swaggerDocument = {
                     401: { description: 'Unauthorized' },
                     403: { description: 'Forbidden - Admin access required' },
                     404: { description: 'Role not found' }
+                }
+            }
+        },
+        '/api/v1/chat-rooms': {
+            get: {
+                tags: ['Chat Rooms'],
+                summary: 'Get all chat rooms',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'page',
+                        in: 'query',
+                        required: false,
+                        schema: { type: 'integer', default: 1 }
+                    },
+                    {
+                        name: 'limit',
+                        in: 'query',
+                        required: false,
+                        schema: { type: 'integer', default: 10 }
+                    },
+                    {
+                        name: 'search',
+                        in: 'query',
+                        required: false,
+                        schema: { type: 'string' }
+                    }
+                ],
+                responses: {
+                    200: {
+                        description: 'List of chat rooms',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        paginate: {
+                                            type: 'object',
+                                            properties: {
+                                                total: { type: 'integer' },
+                                                page: { type: 'integer' },
+                                                limit: { type: 'integer' },
+                                                totalPages: { type: 'integer' }
+                                            }
+                                        },
+                                        data: {
+                                            type: 'array',
+                                            items: {
+                                                type: 'object',
+                                                properties: {
+                                                    id: { type: 'integer' },
+                                                    userId: { type: 'integer' },
+                                                    hotelId: { type: 'integer' },
+                                                    newMessageTime: { type: 'string', format: 'date-time' },
+                                                    createdAt: { type: 'string', format: 'date-time' },
+                                                    updatedAt: { type: 'string', format: 'date-time' },
+                                                    hotel: {
+                                                        type: 'object',
+                                                        properties: {
+                                                            id: { type: 'integer' },
+                                                            name: { type: 'string' }
+                                                        }
+                                                    },
+                                                    user: {
+                                                        type: 'object',
+                                                        properties: {
+                                                            id: { type: 'integer' },
+                                                            name: { type: 'string' },
+                                                            email: { type: 'string' }
+                                                        }
+                                                    },
+                                                    messages: {
+                                                        type: 'array',
+                                                        items: {
+                                                            type: 'object',
+                                                            properties: {
+                                                                id: { type: 'integer' },
+                                                                content: { type: 'string' },
+                                                                senderId: { type: 'integer' },
+                                                                createdAt: { type: 'string', format: 'date-time' },
+                                                                sender: {
+                                                                    type: 'object',
+                                                                    properties: {
+                                                                        id: { type: 'integer' },
+                                                                        name: { type: 'string' },
+                                                                        email: { type: 'string' }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    401: { description: 'Unauthorized' }
+                }
+            },
+            post: {
+                tags: ['Chat Rooms'],
+                summary: 'Create a new chat room',
+                security: [{ bearerAuth: [] }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['hotelId'],
+                                properties: {
+                                    hotelId: { type: 'integer' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    201: {
+                        description: 'Chat room created successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            type: 'object',
+                                            properties: {
+                                                id: { type: 'integer' },
+                                                userId: { type: 'integer' },
+                                                hotelId: { type: 'integer' },
+                                                newMessageTime: { type: 'string', format: 'date-time' },
+                                                createdAt: { type: 'string', format: 'date-time' },
+                                                updatedAt: { type: 'string', format: 'date-time' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    400: { description: 'Bad request' },
+                    401: { description: 'Unauthorized' }
+                }
+            }
+        },
+        '/api/v1/chat-rooms/{id}': {
+            get: {
+                tags: ['Chat Rooms'],
+                summary: 'Get chat room by ID',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: { type: 'integer' }
+                    }
+                ],
+                responses: {
+                    200: {
+                        description: 'Chat room details',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            type: 'object',
+                                            properties: {
+                                                id: { type: 'integer' },
+                                                userId: { type: 'integer' },
+                                                hotelId: { type: 'integer' },
+                                                newMessageTime: { type: 'string', format: 'date-time' },
+                                                createdAt: { type: 'string', format: 'date-time' },
+                                                updatedAt: { type: 'string', format: 'date-time' },
+                                                hotel: {
+                                                    type: 'object',
+                                                    properties: {
+                                                        id: { type: 'integer' },
+                                                        name: { type: 'string' },
+                                                        images: { type: 'array', items: { type: 'string' } }
+                                                    }
+                                                },
+                                                user: {
+                                                    type: 'object',
+                                                    properties: {
+                                                        id: { type: 'integer' },
+                                                        name: { type: 'string' },
+                                                        email: { type: 'string' },
+                                                        avatar: { type: 'string' }
+                                                    }
+                                                },
+                                                messages: {
+                                                    type: 'array',
+                                                    items: {
+                                                        type: 'object',
+                                                        properties: {
+                                                            id: { type: 'integer' },
+                                                            content: { type: 'string' },
+                                                            senderId: { type: 'integer' },
+                                                            createdAt: { type: 'string', format: 'date-time' },
+                                                            sender: {
+                                                                type: 'object',
+                                                                properties: {
+                                                                    id: { type: 'integer' },
+                                                                    name: { type: 'string' },
+                                                                    email: { type: 'string' }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    401: { description: 'Unauthorized' },
+                    404: { description: 'Chat room not found' }
+                }
+            },
+            put: {
+                tags: ['Chat Rooms'],
+                summary: 'Update chat room',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: { type: 'integer' }
+                    }
+                ],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    hotelId: { type: 'integer' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    200: {
+                        description: 'Chat room updated successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            type: 'object',
+                                            properties: {
+                                                id: { type: 'integer' },
+                                                userId: { type: 'integer' },
+                                                hotelId: { type: 'integer' },
+                                                newMessageTime: { type: 'string', format: 'date-time' },
+                                                createdAt: { type: 'string', format: 'date-time' },
+                                                updatedAt: { type: 'string', format: 'date-time' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    400: { description: 'Bad request' },
+                    401: { description: 'Unauthorized' },
+                    403: { description: 'Forbidden' },
+                    404: { description: 'Chat room not found' }
+                }
+            },
+            delete: {
+                tags: ['Chat Rooms'],
+                summary: 'Delete chat room',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: { type: 'integer' }
+                    }
+                ],
+                responses: {
+                    200: {
+                        description: 'Chat room deleted successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    401: { description: 'Unauthorized' },
+                    403: { description: 'Forbidden' },
+                    404: { description: 'Chat room not found' }
+                }
+            }
+        },
+        '/api/v1/chat-rooms/{id}/messages': {
+            get: {
+                tags: ['Chat Rooms'],
+                summary: 'Get messages from a chat room',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: { type: 'integer' }
+                    },
+                    {
+                        name: 'page',
+                        in: 'query',
+                        required: false,
+                        schema: { type: 'integer', default: 1 }
+                    },
+                    {
+                        name: 'limit',
+                        in: 'query',
+                        required: false,
+                        schema: { type: 'integer', default: 10 }
+                    }
+                ],
+                responses: {
+                    200: {
+                        description: 'List of messages',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        paginate: {
+                                            type: 'object',
+                                            properties: {
+                                                total: { type: 'integer' },
+                                                page: { type: 'integer' },
+                                                limit: { type: 'integer' },
+                                                totalPages: { type: 'integer' }
+                                            }
+                                        },
+                                        data: {
+                                            type: 'array',
+                                            items: {
+                                                type: 'object',
+                                                properties: {
+                                                    id: { type: 'integer' },
+                                                    content: { type: 'string' },
+                                                    senderId: { type: 'integer' },
+                                                    chatRoomId: { type: 'integer' },
+                                                    isDeleted: { type: 'boolean' },
+                                                    createdAt: { type: 'string', format: 'date-time' },
+                                                    updatedAt: { type: 'string', format: 'date-time' },
+                                                    sender: {
+                                                        type: 'object',
+                                                        properties: {
+                                                            id: { type: 'integer' },
+                                                            name: { type: 'string' },
+                                                            email: { type: 'string' }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    401: { description: 'Unauthorized' },
+                    404: { description: 'Chat room not found' }
+                }
+            },
+            post: {
+                tags: ['Chat Rooms'],
+                summary: 'Create a new message in a chat room',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: { type: 'integer' }
+                    }
+                ],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['content'],
+                                properties: {
+                                    content: { type: 'string' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    201: {
+                        description: 'Message created successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            type: 'object',
+                                            properties: {
+                                                id: { type: 'integer' },
+                                                content: { type: 'string' },
+                                                senderId: { type: 'integer' },
+                                                chatRoomId: { type: 'integer' },
+                                                isDeleted: { type: 'boolean' },
+                                                createdAt: { type: 'string', format: 'date-time' },
+                                                updatedAt: { type: 'string', format: 'date-time' },
+                                                sender: {
+                                                    type: 'object',
+                                                    properties: {
+                                                        id: { type: 'integer' },
+                                                        name: { type: 'string' },
+                                                        email: { type: 'string' }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    400: { description: 'Bad request' },
+                    401: { description: 'Unauthorized' },
+                    404: { description: 'Chat room not found' }
                 }
             }
         }

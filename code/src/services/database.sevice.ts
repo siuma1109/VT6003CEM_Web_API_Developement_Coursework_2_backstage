@@ -8,6 +8,8 @@ import { Role } from '../models/role.model';
 import { SignUpCodes } from '../models/sign-up-codes.model';
 import { Hotel } from '../models/hotel.model';
 import { UsersHotelsFavourites } from '../models/users-hotels-favourites.model';
+import { ChatRoom } from '../models/chat-room.model';
+import { Message } from '../models/message.model';
 
 // Create and export the Sequelize instance for the application
 const env = process.env.NODE_ENV || 'development';
@@ -29,7 +31,9 @@ const sequelize = new Sequelize({
     UsersRoles,
     SignUpCodes,
     Hotel,
-    UsersHotelsFavourites
+    UsersHotelsFavourites,
+    ChatRoom,
+    Message
   ]
 });
 
