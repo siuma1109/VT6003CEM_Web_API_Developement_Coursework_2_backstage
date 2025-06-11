@@ -38,9 +38,28 @@ This is a TypeScript-based RESTful API project built with Express.js and Postgre
    cd <repository-name>
    ```
 
-2. Using Docker (Recommended):
+2. Environment Setup:
+   - Copy `.env.example` to `.env` in the code directory
+   - Configure the following environment variables:
+     ```
+     DB_USERNAME=your_db_username
+     DB_PASSWORD=your_db_password
+     DB_NAME=your_db_name
+     DB_HOST=your_db_host
+     DB_PORT=your_db_port
+     ```
+   - For development, you can use these default values:
+     ```
+     DB_USERNAME=postgres
+     DB_PASSWORD=postgres
+     DB_NAME=backstage
+     DB_HOST=localhost
+     DB_PORT=5432
+     ```
+
+3. Using Docker (Recommended):
    ```bash
-   docker-compose up
+   docker-compose up -d
    ```
    This will:
    - Start a PostgreSQL database
@@ -48,7 +67,7 @@ This is a TypeScript-based RESTful API project built with Express.js and Postgre
    - Set up the database with migrations
    - Start the development server
 
-3. Manual Setup:
+4. Manual Setup:
    ```bash
    cd code
    npm install
@@ -56,6 +75,46 @@ This is a TypeScript-based RESTful API project built with Express.js and Postgre
    npm run migrate
    npm run dev
    ```
+
+## Database Setup
+
+### Migrations
+The project includes several migrations that create the following tables:
+- Users (with avatar support)
+- Roles
+- User Roles
+- User Tokens
+- Hotels
+- User Favorites
+- Chat Rooms and Messages
+- Sign-up Codes
+
+To manage the database:
+
+```bash
+# Run all migrations
+npm run migrate
+
+# Undo the last migration
+npm run migrate:undo
+
+# Undo all migrations
+npm run migrate:undo:all
+```
+
+### Seeding
+To populate the database with initial data:
+
+```bash
+# Run all seeders
+npm run seed
+
+# Undo the last seed
+npm run seed:undo
+
+# Undo all seeds
+npm run seed:undo:all
+```
 
 ## Available Scripts
 
@@ -75,9 +134,11 @@ The application uses the following environment variables:
 
 - `NODE_ENV` - Environment (development/production)
 - `PORT` - Server port (default: 8081)
-- `POSTGRES_USER` - PostgreSQL username
-- `POSTGRES_PASSWORD` - PostgreSQL password
-- `POSTGRES_DB` - PostgreSQL database name
+- `DB_USERNAME` - PostgreSQL username
+- `DB_PASSWORD` - PostgreSQL password
+- `DB_NAME` - PostgreSQL database name
+- `DB_HOST` - PostgreSQL host
+- `DB_PORT` - PostgreSQL port
 
 ## API Documentation
 
@@ -97,6 +158,7 @@ http://localhost:8081/api-docs
 - Passport.js (Authentication)
 - Multer (File uploads)
 - Swagger UI (API documentation)
+- Faker.js (for seeding data)
 
 ## Development
 
