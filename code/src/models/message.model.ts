@@ -1,5 +1,5 @@
 import { Model, InferAttributes, InferCreationAttributes, DataTypes, CreationOptional } from '@sequelize/core';
-import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table, BelongsTo } from '@sequelize/core/decorators-legacy';
+import { Attribute, PrimaryKey, AutoIncrement, NotNull, Table, BelongsTo, Default } from '@sequelize/core/decorators-legacy';
 import { User } from './user.model';
 import { ChatRoom } from './chat-room.model';
 
@@ -26,6 +26,7 @@ export class Message extends Model<InferAttributes<Message>, InferCreationAttrib
     declare content: string;
 
     @Attribute(DataTypes.BOOLEAN)
+    @Default(false)
     declare isDeleted: CreationOptional<boolean>;
 
     @Attribute(DataTypes.DATE)
