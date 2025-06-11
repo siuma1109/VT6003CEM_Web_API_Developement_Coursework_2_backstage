@@ -1,5 +1,5 @@
 import { Hotel } from '../models/hotel.model';
-import { Op } from 'sequelize';
+import { Op, Order } from 'sequelize';
 import { InferCreationAttributes } from '@sequelize/core';
 import { PaginatedResult } from '../utils/model.util';
 import { paginate } from '../utils/model.util';
@@ -17,8 +17,11 @@ export class HotelRepository {
                     { description: { [Op.iLike]: `%${search.toLowerCase()}%` } },
                     { city: { [Op.iLike]: `%${search.toLowerCase()}%` } }
                 ]
-            }
-        } : {};
+            },
+            order: [['id', 'DESC']] as Order
+        } : {
+            order: [['id', 'DESC']] as Order
+        };
         return await paginate(Hotel, page, limit, options);
     }
 

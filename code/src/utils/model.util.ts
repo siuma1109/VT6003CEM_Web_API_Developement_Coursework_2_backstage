@@ -14,7 +14,7 @@ export const paginate = async <T extends Model>(
     model: ModelStatic<T>,
     page: number,
     limit: number,
-    options: Omit<FindAndCountOptions<Attributes<T>>, 'offset' | 'limit'> = {}
+    options: Omit<FindAndCountOptions<Attributes<T>>, 'offset' | 'limit' | 'order'> = {}
 ): Promise<PaginatedResult<T>> => {
     const offset = (page - 1) * limit;
     const { count, rows } = await model.findAndCountAll({
