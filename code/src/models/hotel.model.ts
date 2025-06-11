@@ -71,13 +71,7 @@ export class Hotel extends Model<InferAttributes<Hotel>, InferCreationAttributes
     declare status: CreationOptional<'pending' | 'active' | 'inactive'>;
 
     @Attribute(DataTypes.JSON)
-    declare customData: CreationOptional<{
-        name?: string;
-        description?: string;
-        images?: string[];
-        facilities?: string[];
-        [key: string]: any;
-    }>;
+    declare customData: CreationOptional<Hotel>;
 
     @Attribute(DataTypes.DATE)
     @NotNull

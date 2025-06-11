@@ -55,13 +55,9 @@ export class HotelService {
         }
 
         // Only allow customData update if provided
-        if (updateData.customData) {
-            updateFields.customData = {
-                ...hotel.customData,
-                ...updateData.customData
-            };
+        if (updateData) {
+            updateFields.customData = updateData;
         }
-
         return await this.repository.update(id, updateFields);
     }
 
