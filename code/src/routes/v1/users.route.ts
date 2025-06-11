@@ -2,8 +2,10 @@ import { Router, RequestHandler } from 'express';
 import { UserController } from '../../controllers/user.controller';
 import { authenticateToken } from '../../services/auth.service';
 import { canAddUser, canUpdateOrDeleteUser } from '../../services/permission.service';
+import multer from 'multer';
 
 const router = Router();
+const upload = multer({ dest: 'uploads/avatars/' });
 
 // Apply authentication middleware to all routes
 router.use(authenticateToken);
@@ -22,5 +24,8 @@ router.put('/:id', canUpdateOrDeleteUser, UserController.updateUser as RequestHa
 
 // Delete user
 router.delete('/:id', canUpdateOrDeleteUser, UserController.deleteUser as RequestHandler);
+
+// Upload avatar
+router.post('/:id/avatar', canUpdateOrDeleteUser, upload.single('avatar'), UserController.uploadAvatar as RequestHandler);
 
 export default router;

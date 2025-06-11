@@ -52,6 +52,9 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
     @NotNull
     declare password: string;
 
+    @Attribute(DataTypes.STRING)
+    declare avatar: CreationOptional<string>;
+
     @Attribute(DataTypes.DATE)
     @NotNull
     declare createdAt: CreationOptional<Date>;

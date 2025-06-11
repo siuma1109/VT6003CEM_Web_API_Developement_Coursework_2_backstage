@@ -4,6 +4,13 @@ import { InferAttributes, InferCreationAttributes } from '@sequelize/core';
 import { UserService } from '../services/user.service';
 import { apiResponse } from '../utils/api-response.util';
 import { handleException } from '../utils/model.util';
+import path from 'path';
+import fs from 'fs';
+import multer from 'multer';
+
+interface FileRequest extends Request {
+    file?: Express.Multer.File;
+}
 
 export class UserController {
     static async getAllUsers(req: Request, res: Response) {
@@ -108,6 +115,68 @@ export class UserController {
                 return apiResponse(res, 404, 'User not found');
             }
             apiResponse(res, 200, 'Profile updated successfully', undefined, updatedUser);
+        } catch (error: any) {
+            const errorResponse = handleException(error);
+            apiResponse(res, 400, errorResponse.message, undefined, undefined, errorResponse.errors);
+        }
+    }
+
+    static async uploadAvatar(req: FileRequest, res: Response) {
+        try {
+            if (!req.file) {
+                return apiResponse(res, 400, 'No file uploaded');
+            }
+
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(req.file.mimetype)) {
+                return apiResponse(res, 400, 'Invalid file type. Only images are allowed.');
+            }
+
+            // Validate file size (5MB)
+            const maxSize = 5 * 1024 * 1024;
+            if (req.file.size > maxSize) {
+                return apiResponse(res, 400, 'File too large. Maximum size is 5MB.');
+            }
+
+            let id = req.params.id;
+            if(id == 'me') {
+                const user = req.user as User;
+                if (!user) {
+                    return apiResponse(res, 401, 'User not authenticated');
+                }
+                id = user.id.toString();
+            }
+
+            // Delete old avatar if exists
+            const user = await UserService.getById(parseInt(id));
+            if (!user) {
+                return apiResponse(res, 404, 'User not found');
+            }
+
+            if (user.avatar) {
+                const oldAvatarPath = path.join(process.cwd(), user.avatar);
+                if (fs.existsSync(oldAvatarPath)) {
+                    fs.unlinkSync(oldAvatarPath);
+                }
+            }
+
+            // Generate new filename with original extension
+            const ext = path.extname(req.file.originalname);
+            const newFilename = `${Date.now()}-${Math.round(Math.random() * 1E9)}${ext}`;
+            const newPath = path.join('uploads/avatars', newFilename);
+
+            // Move file to new location with proper extension
+            fs.renameSync(req.file.path, path.join(process.cwd(), newPath));
+
+            // Update user with new avatar path
+            const updatedUser = await UserService.update(parseInt(id), { avatar: newPath });
+            
+            if (!updatedUser) {
+                return apiResponse(res, 404, 'User not found');
+            }
+            
+            apiResponse(res, 200, 'Avatar uploaded successfully', undefined, updatedUser);
         } catch (error: any) {
             const errorResponse = handleException(error);
             apiResponse(res, 400, errorResponse.message, undefined, undefined, errorResponse.errors);

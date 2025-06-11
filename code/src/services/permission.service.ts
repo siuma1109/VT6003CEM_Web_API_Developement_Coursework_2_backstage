@@ -102,7 +102,7 @@ export const isAdmin = async (req: any, res: Response, next: any) => {
 
         //console.log('User role query result:', userRole);
         if (userRole) {
-            console.log('User has admin role');
+            //console.log('User has admin role');
             return next();
         }
 
