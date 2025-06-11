@@ -526,6 +526,217 @@ export const swaggerDocument = {
                 }
             }
         },
+        '/api/v1/users/{id}/favourites': {
+            get: {
+                tags: ['Users'],
+                summary: 'Get user\'s favorite hotels',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: {
+                            type: 'string',
+                        },
+                        description: 'User ID or "me" to get current user\'s favorites'
+                    }
+                ],
+                responses: {
+                    200: {
+                        description: 'List of favorite hotels',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            type: 'array',
+                                            items: {
+                                                type: 'object',
+                                                properties: {
+                                                    id: { type: 'integer' },
+                                                    hotelId: { type: 'integer' },
+                                                    hotel: {
+                                                        type: 'object',
+                                                        properties: {
+                                                            id: { type: 'integer' },
+                                                            name: { type: 'string' },
+                                                            description: { type: 'string' },
+                                                            address: { type: 'string' }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    401: { description: 'Unauthorized - User not authenticated' },
+                    404: { description: 'User not found' }
+                }
+            },
+            post: {
+                tags: ['Users'],
+                summary: 'Add a hotel to user\'s favorites',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: {
+                            type: 'string',
+                        },
+                        description: 'User ID or "me" to add to current user\'s favorites'
+                    }
+                ],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['hotelId'],
+                                properties: {
+                                    hotelId: { type: 'integer' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    201: {
+                        description: 'Hotel added to favorites successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            type: 'object',
+                                            properties: {
+                                                id: { type: 'integer' },
+                                                userId: { type: 'integer' },
+                                                hotelId: { type: 'integer' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    400: { description: 'Hotel already in favorites' },
+                    401: { description: 'Unauthorized - User not authenticated' },
+                    404: { description: 'Hotel not found' }
+                }
+            },
+            delete: {
+                tags: ['Users'],
+                summary: 'Remove a hotel from user\'s favorites',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: {
+                            type: 'string',
+                        },
+                        description: 'User ID or "me" to remove from current user\'s favorites'
+                    }
+                ],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['hotelId'],
+                                properties: {
+                                    hotelId: { type: 'integer' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    200: {
+                        description: 'Hotel removed from favorites successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    401: { description: 'Unauthorized - User not authenticated' },
+                    404: { description: 'Favorite not found' }
+                }
+            }
+        },
+        '/api/v1/users/{id}/favourites/check': {
+            get: {
+                tags: ['Users'],
+                summary: 'Check if a hotel is in user\'s favorites',
+                security: [{ bearerAuth: [] }],
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        schema: {
+                            type: 'string',
+                        },
+                        description: 'User ID or "me" to check current user\'s favorites'
+                    },
+                    {
+                        name: 'hotelId',
+                        in: 'query',
+                        required: true,
+                        schema: {
+                            type: 'integer'
+                        },
+                        description: 'ID of the hotel to check'
+                    }
+                ],
+                responses: {
+                    200: {
+                        description: 'Favorite status checked successfully',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        success: { type: 'boolean' },
+                                        message: { type: 'string' },
+                                        data: {
+                                            type: 'object',
+                                            properties: {
+                                                isFavourite: { type: 'boolean' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    401: { description: 'Unauthorized - User not authenticated' },
+                    400: { description: 'Hotel ID is required' }
+                }
+            }
+        },
         '/api/v1/hotel-beds/check-status': {
             get: {
                 tags: ['Hotelbeds'],

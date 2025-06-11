@@ -28,4 +28,10 @@ router.delete('/:id', canUpdateOrDeleteUser, UserController.deleteUser as Reques
 // Upload avatar
 router.post('/:id/avatar', canUpdateOrDeleteUser, upload.single('avatar'), UserController.uploadAvatar as RequestHandler);
 
+// Favorites routes
+router.post('/:id/favourites', canUpdateOrDeleteUser, UserController.addToFavourites as RequestHandler);
+router.delete('/:id/favourites', canUpdateOrDeleteUser, UserController.removeFromFavourites as RequestHandler);
+router.get('/:id/favourites', canUpdateOrDeleteUser, UserController.getFavourites as RequestHandler);
+router.get('/:id/favourites/check', canUpdateOrDeleteUser, UserController.checkFavourite as RequestHandler);
+
 export default router;
